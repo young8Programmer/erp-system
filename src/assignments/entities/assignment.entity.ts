@@ -7,29 +7,38 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Lesson } from 'src/lesson/entities/lesson.entity';
-import { Submission } from 'src/submissions/entities/submission.entity'; // Submission entitetini import qilish
+import { Submission } from 'src/submissions/entities/submission.entity';
 
 @Entity('assignments')
 export class Assignment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  assignment: string;
+  @Column({ type: 'text', nullable: true })
+  title: string;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ nullable: true })
+  description: string;
+
+  @Column({ nullable: true })
+  fileUrl: string; // Backblaze B2’dan kelgan fayl URL’i
+
+  @Column({ nullable: true })
   dueDate: Date;
 
   @UpdateDateColumn({ type: 'timestamp', nullable: true })
   updatedAt: Date;
 
   @ManyToOne(() => Lesson, (lesson) => lesson.assignments, {
-    onDelete: 'CASCADE',
+    onDelete: 'CASCADE', // Lesson o‘chirilganda assignment’lar ham o‘chiriladi
   })
   lesson: Lesson;
 
-  @OneToMany(() => Submission, (submission) => submission.assignment)
+  @OneToMany(() => Submission, (submission) => submission.assignment, {
+    onDelete: 'CASCADE', // Assignment o‘chirilganda submission’lar ham o‘chiriladi
+  })
   submissions: Submission[];
 
-  status: string
+  @Column({ default: 'pending' })
+  status: string;
 }
